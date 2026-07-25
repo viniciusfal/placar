@@ -3,11 +3,13 @@ package middleware
 import (
 	"context"
 	"log/slog"
+	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/viniciusfal/placar/internal/apierror"
 	"github.com/viniciusfal/placar/internal/metrics"
 )
 
@@ -83,5 +85,18 @@ func Metrics() gin.HandlerFunc {
 
 		metrics.HTTPRequestsTotal.WithLabelValues(c.Request.Method, path, status).Inc()
 		metrics.HTTPRequestDuration.WithLabelValues(c.Request.Method, path).Observe(duration)
+	}
+}
+
+func Recovery(log *slog.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("panic recuperado", slog.Any("panic", r))
+				p := apierror.New(http.StatusInternalServerError, "Erro interno do servidor", "")
+				apierror.Respond(c, log, p)
+			}
+		}()
+		c.Next()
 	}
 }

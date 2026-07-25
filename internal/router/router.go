@@ -16,6 +16,7 @@ func New(deps *Dependencies) *gin.Engine {
 	r := gin.New()
 
 	r.Use(
+		middleware.Recovery(deps.Logger),
 		middleware.RequestID(),
 		middleware.StructuredLogger(deps.Logger),
 		middleware.Metrics(),
