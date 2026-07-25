@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports: ["27017:27017"]
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand(\"ping\").ok' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+          cache: true
+
+      - name: Instalar ferramentas
+        run: |
+          go install mvdan.cc/gofumpt@latest
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Formatação
+        run: make fmt && git diff --exit-code # falha se fmt mudou algo não commitado
+
+      - name: Vet
+        run: make vet
+
+      - name: Lint
+        run: make lint
+
+      - name: Secrets
+        uses: gitleaks/gitleaks-action@v2
+
+      - name: Vulnerabilidades
+        run: make vuln
+
+      - name: Testes (com race detector)
+        run: make test-race
+        env:
+          DATABASE_URL: mongodb://localhost:27017/test_db
+
+      - name: Build
+        run: make build
