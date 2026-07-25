@@ -32,8 +32,6 @@ jobs:
           go install mvdan.cc/gofumpt@latest
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
           go install golang.org/x/vuln/cmd/govulncheck@latest
-          go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Formatação
         run: make fmt && git diff --exit-code # falha se fmt mudou algo não commitado

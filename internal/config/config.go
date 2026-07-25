@@ -26,7 +26,6 @@ func Load() (*Config, error) {
 	}
 
 	return cfg, nil
-
 }
 
 func getEnv(key, fallback string) string {

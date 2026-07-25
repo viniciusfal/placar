@@ -32,5 +32,7 @@ func main() {
 	}
 
 	r := router.New(deps)
-	r.Run(":" + cfg.Port)
+	if err := r.Run(":" + cfg.Port); err != nil {
+		log.Fatal(err)
+	}
 }

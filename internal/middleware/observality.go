@@ -60,7 +60,8 @@ func StructuredLogger(base *slog.Logger) gin.HandlerFunc {
 
 		c.Next()
 
-		reqLogger.Info("request finalizada",
+		reqLogger.Info(
+			"request finalizada",
 			slog.Int("status", c.Writer.Status()),
 			slog.Duration("latency", time.Since(start)),
 		)
