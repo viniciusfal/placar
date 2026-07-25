@@ -10,8 +10,10 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/viniciusfal/placar/internal/config"
+	"github.com/viniciusfal/placar/internal/health"
 	"github.com/viniciusfal/placar/internal/logger"
 	"github.com/viniciusfal/placar/internal/platform/mongodb"
+	"github.com/viniciusfal/placar/internal/platform/redis"
 	"github.com/viniciusfal/placar/internal/router"
 	"github.com/viniciusfal/placar/internal/server"
 )
@@ -35,16 +37,30 @@ func main() {
 
 	l := logger.New(cfg.Mode)
 
-	mongoClient, err := mongodb.Connect(ctx, cfg.DatabaseURL) // agora É cancelável
+	mongoClient, err := mongodb.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer mongodb.Disconnect(context.Background(), mongoClient, l)
+	// db := mongoClient.Database("")
 
-	db := mongoClient.Database("")
-	_ = db
+	redisClient, err := redis.Connect(ctx, cfg.RedisAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer redis.Disconnect(redisClient, l)
 
-	deps := &router.Dependencies{Logger: l}
+	h := health.New()
+	h.Register("mongodb", func(ctx context.Context) error {
+		return mongoClient.Ping(ctx, nil)
+	})
+	h.Register("redis", func(ctx context.Context) error {
+		return redisClient.Ping(ctx).Err()
+	})
+
+	deps := &router.Dependencies{
+		Logger: l,
+		Health: h}
 	r := router.New(deps)
 
 	if err := server.Run(ctx, r, cfg.Port, l); err != nil {
