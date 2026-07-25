@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/viniciusfal/placar/internal/config"
+	"github.com/viniciusfal/placar/internal/logger"
+	"github.com/viniciusfal/placar/internal/router"
 )
 
 func main() {
@@ -14,11 +16,21 @@ func main() {
 		log.Fatal("Erro ao Carregar.env file")
 	}
 
-	_, err = config.Load()
+	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(("tudo certo com a aplicação"))
+	if cfg.Mode == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
+	l := logger.New(cfg.Mode)
+
+	deps := &router.Dependencies{
+		Logger: l,
+	}
+
+	r := router.New(deps)
+	r.Run(":" + cfg.Port)
 }
