@@ -1,9 +1,16 @@
 package game
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
+)
+
+var (
+	ErrJogador1Obrigatorio         = errors.New("Jogador 1 é obrigatório")
+	ErrJogador2Obrigatorio         = errors.New("Jogador 2 é obrigatório")
+	ErrPontuacaoNecessariaInvalida = errors.New("Pontuacao necessaria deve ser maior que 0")
 )
 
 type Game struct {
@@ -25,7 +32,19 @@ type CreateGameInput struct {
 	PontuacaoNecessaria int
 }
 
-func CreateGame(input CreateGameInput) (Game, error) {
+func CreateGame(input CreateGameInput) (*Game, error) {
+	if input.Jogador1 == "" {
+		return nil, ErrJogador1Obrigatorio
+	}
+
+	if input.Jogador2 == "" {
+		return nil, ErrJogador2Obrigatorio
+	}
+
+	if input.PontuacaoNecessaria < 0 {
+		return nil, ErrPontuacaoNecessariaInvalida
+	}
+
 	game := Game{
 		ID:                  uuid.New(),
 		Jogador1:            input.Jogador1,
@@ -37,5 +56,5 @@ func CreateGame(input CreateGameInput) (Game, error) {
 		InicioPartida:       time.Now(),
 	}
 
-	return game, nil
+	return &game, nil
 }
