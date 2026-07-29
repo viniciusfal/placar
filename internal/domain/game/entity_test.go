@@ -1,4 +1,4 @@
-package game
+package game_test
 
 import (
 	"testing"
@@ -6,32 +6,33 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/viniciusfal/placar/internal/domain/game"
 )
 
 func TestGameEntity(t *testing.T) {
 	tests := []struct {
 		name    string
-		input   CreateGameInput
+		input   game.CreateGameInput
 		wantErr error
 	}{
 		{
 			name:  "criar partida valida",
-			input: CreateGameInput{Jogador1: "vinicius", Jogador2: "jose", PontuacaoNecessaria: 10},
+			input: game.CreateGameInput{Jogador1: "vinicius", Jogador2: "jose", PontuacaoNecessaria: 10},
 		},
 		{
 			name:    "sem jogador 1",
-			input:   CreateGameInput{Jogador2: "jose", PontuacaoNecessaria: 10},
-			wantErr: ErrJogador1Obrigatorio,
+			input:   game.CreateGameInput{Jogador2: "jose", PontuacaoNecessaria: 10},
+			wantErr: game.ErrJogador1Obrigatorio,
 		},
 		{
 			name:    "sem jogador 2",
-			input:   CreateGameInput{Jogador1: "vinicius", PontuacaoNecessaria: 10},
-			wantErr: ErrJogador2Obrigatorio,
+			input:   game.CreateGameInput{Jogador1: "vinicius", PontuacaoNecessaria: 10},
+			wantErr: game.ErrJogador2Obrigatorio,
 		},
 		{
 			name:    "pontuacao necessaria invalida",
-			input:   CreateGameInput{Jogador1: "vinicius", Jogador2: "jose", PontuacaoNecessaria: -1},
-			wantErr: ErrPontuacaoNecessariaInvalida,
+			input:   game.CreateGameInput{Jogador1: "vinicius", Jogador2: "jose", PontuacaoNecessaria: -1},
+			wantErr: game.ErrPontuacaoNecessariaInvalida,
 		},
 	}
 
@@ -39,7 +40,7 @@ func TestGameEntity(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			assert := assert.New(t)
 
-			game, err := CreateGame(tt.input)
+			game, err := game.CreateGame(tt.input)
 
 			if tt.wantErr != nil {
 				assert.ErrorIs(err, tt.wantErr)

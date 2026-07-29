@@ -39,7 +39,7 @@ secrets: ## Escaneia segredos vazados (gitleaks)
 	gitleaks detect --source . -v
 
 mocks: ## Gera mocks (mockery)
-	mockery --all --output ./internal/mocks
+	mockery
 	
 check: fmt vet lint test-race vuln ## Roda tudo que o CI roda, localmente
 	

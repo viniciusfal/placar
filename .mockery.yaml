@@ -1,0 +1,8 @@
+# .mockery.yaml
+with-expecter: true
+dir: "{{.InterfaceDir}}/mocks"
+outpkg: mocks
+packages:
+  github.com/viniciusfal/placar/internal/domain/game:
+    interfaces:
+      Repository:

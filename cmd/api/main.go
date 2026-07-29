@@ -60,7 +60,8 @@ func main() {
 
 	deps := &router.Dependencies{
 		Logger: l,
-		Health: h}
+		Health: h,
+	}
 	r := router.New(deps)
 
 	if err := server.Run(ctx, r, cfg.Port, l); err != nil {
