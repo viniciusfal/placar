@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/viniciusfal/placar/internal/domain/game"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -25,13 +26,16 @@ func (r *GameRepository) Salvar(ctx context.Context, g *game.Game) error {
 }
 
 func (r *GameRepository) BuscarPorID(ctx context.Context, id string) (*game.Game, error) {
-	var g game.Game
-
-	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&g)
-	if errors.Is(err, mongo.ErrNoDocuments) {
+	uid, err := uuid.Parse(id)
+	if err != nil {
 		return nil, game.ErrGameNaoEncontrado
 	}
 
+	var g game.Game
+	err = r.collection.FindOne(ctx, bson.M{"_id": uid}).Decode(&g)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, game.ErrGameNaoEncontrado
+	}
 	if err != nil {
 		return nil, err
 	}
