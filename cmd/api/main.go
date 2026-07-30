@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/viniciusfal/placar/internal/config"
+	"github.com/viniciusfal/placar/internal/domain/game"
 	"github.com/viniciusfal/placar/internal/health"
 	"github.com/viniciusfal/placar/internal/logger"
 	"github.com/viniciusfal/placar/internal/platform/mongodb"
@@ -42,7 +43,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer mongodb.Disconnect(context.Background(), mongoClient, l)
-	// db := mongoClient.Database("")
+	db := mongoClient.Database("")
 
 	redisClient, err := redis.Connect(ctx, cfg.RedisAddr)
 	if err != nil {
@@ -50,6 +51,7 @@ func main() {
 	}
 	defer redis.Disconnect(redisClient, l)
 
+	// Health
 	h := health.New()
 	h.Register("mongodb", func(ctx context.Context) error {
 		return mongoClient.Ping(ctx, nil)
@@ -58,9 +60,17 @@ func main() {
 		return redisClient.Ping(ctx).Err()
 	})
 
+	// Wiring do Dominio Game
+	gameRepo := mongodb.NewGameRepository(db)
+	gameSvc := game.NewService(gameRepo)
+	gameCtrl := game.NewController(gameSvc)
+
 	deps := &router.Dependencies{
 		Logger: l,
 		Health: h,
+		Modules: []router.Module{
+			gameCtrl,
+		},
 	}
 	r := router.New(deps)
 
