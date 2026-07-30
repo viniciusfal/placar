@@ -15,7 +15,7 @@ var (
 )
 
 type Game struct {
-	ID                  uuid.UUID
+	ID                  uuid.UUID `bson:"_id"` // só esse campo tem tag, por NECESSIDADE técnica real (_id é especial no Mongo)
 	Jogador1            string
 	Jogador2            string
 	PontuacaoJogador1   int
