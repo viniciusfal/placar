@@ -15,16 +15,16 @@ var (
 )
 
 type Game struct {
-	ID                  uuid.UUID `bson:"_id"` // só esse campo tem tag, por NECESSIDADE técnica real (_id é especial no Mongo)
-	Jogador1            string
-	Jogador2            string
-	PontuacaoJogador1   int
-	PontuacaoJogador2   int
-	PontuacaoNecessaria int
-	Vencedor            *string
-	StatusPartida       string
-	InicioPartida       time.Time
-	AtualizadoEm        *time.Time
+	ID                  uuid.UUID  `bson:"_id"`
+	Jogador1            string     `bson:"jogador1"`
+	Jogador2            string     `bson:"jogador2"`
+	PontuacaoJogador1   int        `bson:"pontuacao_jogador1"`
+	PontuacaoJogador2   int        `bson:"pontuacao_jogador2"`
+	StatusPartida       string     `bson:"status_partida"`
+	Vencedor            *string    `bson:"vencedor"`
+	PontuacaoNecessaria int        `bson:"pontuacao_necessaria"`
+	InicioPartida       time.Time  `bson:"inicio_partida"`
+	AtualizadoEm        *time.Time `bson:"atualizado_em"`
 }
 
 type CreateGameInput struct {
