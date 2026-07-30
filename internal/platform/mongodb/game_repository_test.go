@@ -20,9 +20,10 @@ func setupTestDB(t *testing.T) *mongo.Database {
 	require.NoError(t, err) // Se tiver erro o container vai ser parado imediatamente (diferente do assert)
 
 	t.Cleanup(func() {
-		container.Terminate(ctx)
+		if err := container.Terminate(ctx); err != nil {
+			t.Logf("falha ao encerrar container: %v", err)
+		}
 	})
-
 	uri, err := container.ConnectionString(ctx)
 	require.NoError(t, err)
 
