@@ -19,6 +19,9 @@ test: ## Roda os testes unitários
 test-race: ## Roda testes com detector de data race
 	go test -race -count=1 ./...
 
+test-integration: ## Testes de integração (lentos, precisam de Docker)
+	go test -count=1 -tags=integration ./...
+
 test-cover: ## Roda testes com cobertura
 	go test -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out

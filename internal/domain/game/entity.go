@@ -11,6 +11,7 @@ var (
 	ErrJogador1Obrigatorio         = errors.New("Jogador 1 é obrigatório")
 	ErrJogador2Obrigatorio         = errors.New("Jogador 2 é obrigatório")
 	ErrPontuacaoNecessariaInvalida = errors.New("Pontuacao necessaria deve ser maior que 0")
+	ErrGameNaoEncontrado           = errors.New("Game não encontrado")
 )
 
 type Game struct {
