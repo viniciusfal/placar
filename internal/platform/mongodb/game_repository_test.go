@@ -1,3 +1,5 @@
+//go:build integration
+
 package mongodb_test
 
 import (

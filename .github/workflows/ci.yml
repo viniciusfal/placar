@@ -48,8 +48,11 @@ jobs:
       - name: Vulnerabilidades
         run: make vuln
 
-      - name: Testes (com race detector)
+      - name: Testes unitários
         run: make test-race
+        
+      - name: Testes de integração
+        run: make test-integration
         env:
           DATABASE_URL: mongodb://localhost:27017/test_db
 
